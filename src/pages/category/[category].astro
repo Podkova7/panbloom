@@ -1,0 +1,299 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import { SITE_TITLE } from '../../consts';
+
+export async function getStaticPaths() {
+	const allPosts = await getCollection('blog');
+
+	const categories = [
+		{
+			name: 'Game Reviews',
+			slug: 'game-reviews',
+			description: 'In-depth, independent reviews of the latest mobile games on iOS and Android. Frame rates, touch latency, and monetization tested.',
+		},
+		{
+			name: 'App Reviews',
+			slug: 'app-reviews',
+			description: 'Critical teardowns, performance analyses, and usability ratings of modern productivity, creative, and utility mobile applications.',
+		},
+		{
+			name: 'Game Guides',
+			slug: 'game-guides',
+			description: 'Masterclasses, walkthroughs, relic farming strategies, and speed-tuning optimization guides for top mobile and emulation titles.',
+		},
+		{
+			name: 'App Tips',
+			slug: 'app-tips',
+			description: 'Power-user tutorials, battery longevity science, and security hardening configurations for iOS and Android smartphones.',
+		},
+		{
+			name: 'Comparisons',
+			slug: 'comparisons',
+			description: 'Head-to-head comparisons of mobile games, creative tools, and operating system platforms with empirical benchmarks.',
+		},
+		{
+			name: 'News',
+			slug: 'news',
+			description: 'Breaking mobile gaming announcements, smartphone tech news, platform updates, and verified release schedules.',
+		},
+		{
+			name: 'Best Picks',
+			slug: 'best-picks',
+			description: 'Curated roundups, top-ten recommendations, and essential offline titles for iOS and Android enthusiasts.',
+		},
+	];
+
+	return categories.map((cat) => {
+		const filteredPosts = allPosts
+			.filter((post) => {
+				const postCat = ((post.data as any).category || '')
+					.toLowerCase()
+					.trim()
+					.replace(/[^a-z0-9]+/g, '-')
+					.replace(/(^-|-$)/g, '');
+				return postCat === cat.slug;
+			})
+			.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+		return {
+			params: { category: cat.slug },
+			props: { categoryInfo: cat, posts: filteredPosts },
+		};
+	});
+}
+
+const { categoryInfo, posts } = Astro.props;
+
+const categorySchema = {
+	'@context': 'https://schema.org',
+	'@type': 'CollectionPage',
+	name: categoryInfo.name,
+	description: categoryInfo.description,
+	url: Astro.url.href,
+	isPartOf: {
+		'@type': 'WebSite',
+		name: 'PanBloom',
+		url: 'https://panbloom.com',
+	},
+};
+
+const categoryBreadcrumbs = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: [
+		{
+			'@type': 'ListItem',
+			position: 1,
+			name: 'Home',
+			item: 'https://panbloom.com/',
+		},
+		{
+			'@type': 'ListItem',
+			position: 2,
+			name: categoryInfo.name,
+			item: Astro.url.href,
+		},
+	],
+};
+---
+
+<BaseLayout
+	title={`${categoryInfo.name} | ${SITE_TITLE}`}
+	description={categoryInfo.description}
+>
+	<script type="application/ld+json" set:html={JSON.stringify(categorySchema)} />
+	<script type="application/ld+json" set:html={JSON.stringify(categoryBreadcrumbs)} />
+	<div class="category-page">
+		<div class="container">
+			<!-- Breadcrumb & Header -->
+			<nav class="breadcrumb" aria-label="Breadcrumb">
+				<a href="/" class="crumb-link">Home</a>
+				<span class="crumb-sep">/</span>
+				<span class="crumb-current">{categoryInfo.name}</span>
+			</nav>
+
+			<header class="category-header">
+				<div class="header-top">
+					<span class="category-tag">Category Hub</span>
+					<span class="article-counter">{posts.length} {posts.length === 1 ? 'Article' : 'Articles'}</span>
+				</div>
+				<h1 class="category-title">{categoryInfo.name}</h1>
+				<p class="category-description">{categoryInfo.description}</p>
+			</header>
+
+			<!-- 3-Column Responsive Article Grid -->
+			<section class="grid-section">
+				{
+					posts.length > 0 ? (
+						<div class="article-grid">
+							{
+								posts.map((post) => (
+									<ArticleCard post={post} />
+								))
+							}
+						</div>
+					) : (
+						<div class="empty-state">
+							<div class="empty-icon">📁</div>
+							<h2 class="empty-title">No articles published yet</h2>
+							<p class="empty-text">
+								We are currently preparing in-depth teardowns and reviews for <strong>{categoryInfo.name}</strong>. Check back soon!
+							</p>
+							<a href="/" class="back-home-btn">&larr; Return to All Articles</a>
+						</div>
+					)
+				}
+			</section>
+		</div>
+	</div>
+</BaseLayout>
+
+<style>
+	.category-page {
+		background-color: #ffffff;
+		padding-top: 2rem;
+		padding-bottom: 5rem;
+	}
+
+	.breadcrumb {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: 0.8125rem;
+		color: var(--color-text-muted);
+		margin-bottom: 1.5rem;
+	}
+
+	.crumb-link {
+		color: var(--color-blue-link);
+		text-decoration: none;
+	}
+
+	.crumb-link:hover {
+		text-decoration: underline;
+	}
+
+	.crumb-sep {
+		color: #cbd5e1;
+	}
+
+	.crumb-current {
+		color: var(--color-text-main);
+		font-weight: 600;
+	}
+
+	.category-header {
+		margin-bottom: 2.75rem;
+		border-bottom: 1px solid #e5e7eb;
+		padding-bottom: 1.75rem;
+	}
+
+	.header-top {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		margin-bottom: 0.75rem;
+	}
+
+	.category-tag {
+		font-size: 0.72rem;
+		font-weight: 800;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: var(--color-badge-blue);
+		background-color: #eff6ff;
+		padding: 0.2rem 0.6rem;
+		border-radius: 9999px;
+		border: 1px solid #dbeafe;
+	}
+
+	.article-counter {
+		font-size: 0.8125rem;
+		color: var(--color-text-muted);
+		font-weight: 500;
+	}
+
+	.category-title {
+		font-size: 2.35rem;
+		font-weight: 800;
+		color: var(--color-text-main);
+		line-height: 1.2;
+		letter-spacing: -0.025em;
+		margin: 0 0 0.75rem 0;
+	}
+
+	.category-description {
+		font-size: 1.05rem;
+		line-height: 1.6;
+		color: var(--color-text-sub);
+		margin: 0;
+		max-width: 800px;
+	}
+
+	.article-grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 2rem 1.75rem;
+	}
+
+	@media (min-width: 640px) {
+		.article-grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	@media (min-width: 1024px) {
+		.article-grid {
+			grid-template-columns: repeat(3, 1fr);
+			gap: 2.5rem 1.85rem;
+		}
+	}
+
+	.empty-state {
+		text-align: center;
+		padding: 4rem 1.5rem;
+		background: #f9fafb;
+		border: 1px solid #e5e7eb;
+		border-radius: 12px;
+		max-width: 600px;
+		margin: 2rem auto;
+	}
+
+	.empty-icon {
+		font-size: 2.5rem;
+		margin-bottom: 1rem;
+	}
+
+	.empty-title {
+		font-size: 1.35rem;
+		font-weight: 700;
+		color: var(--color-text-main);
+		margin: 0 0 0.5rem 0;
+	}
+
+	.empty-text {
+		color: var(--color-text-sub);
+		font-size: 0.95rem;
+		line-height: 1.5;
+		margin: 0 0 1.5rem 0;
+	}
+
+	.back-home-btn {
+		display: inline-block;
+		background-color: #111827;
+		color: #ffffff;
+		padding: 0.6rem 1.25rem;
+		border-radius: 6px;
+		font-size: 0.875rem;
+		font-weight: 600;
+		text-decoration: none;
+		transition: background-color 0.15s ease;
+	}
+
+	.back-home-btn:hover {
+		background-color: #1f2937;
+		text-decoration: none;
+	}
+</style>

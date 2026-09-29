@@ -1,0 +1,218 @@
+---
+const currentYear = new Date().getFullYear();
+
+const sectionLinks = [
+	{ name: 'Game Reviews', href: '/category/game-reviews/' },
+	{ name: 'App Reviews', href: '/category/app-reviews/' },
+	{ name: 'Game Guides', href: '/category/game-guides/' },
+	{ name: 'App Tips', href: '/category/app-tips/' },
+	{ name: 'Comparisons', href: '/category/comparisons/' },
+	{ name: 'News', href: '/category/news/' },
+	{ name: 'Best Picks', href: '/category/best-picks/' },
+];
+
+const aboutLinks = [
+	{ name: 'About Us', href: '/about' },
+	{ name: 'Our Authors', href: '/authors/' },
+	{ name: 'Editorial Policy', href: '/editorial-policy' },
+	{ name: 'Contact', href: '/contact' },
+	{ name: 'Privacy Policy', href: '/privacy-policy' },
+	{ name: 'Cookie Policy', href: '/cookie-policy' },
+	{ name: 'Terms & Conditions', href: '/terms' },
+];
+
+const followLinks = [
+	{ name: 'Facebook', href: 'https://facebook.com' },
+	{ name: 'Instagram', href: 'https://instagram.com' },
+	{ name: 'RSS feed', href: '/rss.xml' },
+	{ name: 'Sitemap', href: '/sitemap.xml' },
+];
+---
+
+<footer class="site-footer">
+	<div class="container footer-container">
+		<!-- 4 Columns Grid -->
+		<div class="footer-columns">
+			<!-- Col 1: Brand / Description / Inline Badge -->
+			<div class="footer-col brand-col">
+				<h4 class="col-heading brand-title">PANBLOOM.COM</h4>
+				<p class="brand-text">
+					Independent reviews, guides and news for iOS and Android apps and games, published since 2020.
+				</p>
+			</div>
+
+			<!-- Col 2: Sections -->
+			<div class="footer-col">
+				<h4 class="col-heading">SECTIONS</h4>
+				<ul class="vertical-links">
+					{
+						sectionLinks.map((item) => (
+							<li>
+								<a href={item.href}>{item.name}</a>
+							</li>
+						))
+					}
+				</ul>
+			</div>
+
+			<!-- Col 3: About This Site -->
+			<div class="footer-col">
+				<h4 class="col-heading">ABOUT THIS SITE</h4>
+				<ul class="vertical-links">
+					{
+						aboutLinks.map((item) => (
+							<li>
+								<a href={item.href}>{item.name}</a>
+							</li>
+						))
+					}
+				</ul>
+			</div>
+
+			<!-- Col 4: Follow -->
+			<div class="footer-col">
+				<h4 class="col-heading">FOLLOW</h4>
+				<ul class="vertical-links">
+					{
+						followLinks.map((item) => (
+							<li>
+								<a
+									href={item.href}
+									target={item.href.startsWith('http') ? '_blank' : undefined}
+									rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+								>
+									{item.name}
+								</a>
+							</li>
+						))
+					}
+				</ul>
+			</div>
+		</div>
+
+		<!-- Legal, Corporate Registration & AdSense Disclaimers -->
+		<div class="footer-bottom">
+			<p class="legal-copy">
+				&copy; 2020–{currentYear} PanBloom.com. Published by SATMAT DIGITAL LTD. Company Type: Private company limited by shares. Situation of Registered Office: England and Wales. Registered Office Address: 308 St. Pauls Road, London, England N1 2LF. SIC Code: 47910.
+			</p>
+			<p class="disclosure-copy">
+				PanBloom.com is reader-supported and carries advertising and affiliate links. See our <a href="/editorial-policy">Editorial Policy</a> for how that works. All trademarks and registered trademarks are the property of their respective owners.
+			</p>
+		</div>
+	</div>
+</footer>
+
+<style>
+	.site-footer {
+		background-color: var(--color-footer-bg);
+		color: #ffffff;
+		padding: 3rem 0 2rem;
+		border-top: 1px solid var(--color-header-border);
+		width: 100%;
+		font-size: 0.8125rem;
+	}
+
+	.footer-container {
+		display: flex;
+		flex-direction: column;
+		gap: 2.75rem;
+	}
+
+	.footer-columns {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 2rem;
+	}
+
+	@media (min-width: 640px) {
+		.footer-columns {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	@media (min-width: 960px) {
+		.footer-columns {
+			grid-template-columns: 1.4fr 1fr 1fr 1fr;
+			gap: 2.5rem;
+		}
+	}
+
+	.footer-col {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.brand-col {
+		gap: 0.65rem;
+	}
+
+	.col-heading {
+		font-size: 0.8125rem;
+		font-weight: 700;
+		color: #ffffff;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+		margin: 0 0 0.85rem 0;
+	}
+
+	.brand-title {
+		letter-spacing: 0.04em;
+	}
+
+	.brand-text {
+		color: #9ca3af;
+		font-size: 0.8125rem;
+		line-height: 1.6;
+		margin: 0;
+		max-width: 320px;
+	}
+
+
+	.vertical-links {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.45rem;
+	}
+
+	/* Explicit underline matching the screenshot */
+	.vertical-links a {
+		color: #ffffff;
+		text-decoration: underline;
+		text-underline-offset: 2px;
+		font-size: 0.8125rem;
+		transition: opacity 0.15s ease;
+		display: inline-block;
+	}
+
+	.vertical-links a:hover {
+		opacity: 0.8;
+	}
+
+	.footer-bottom {
+		border-top: 1px solid rgba(255, 255, 255, 0.1);
+		padding-top: 1.5rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.65rem;
+		font-size: 0.72rem;
+		color: #8b949e;
+		line-height: 1.55;
+	}
+
+	.legal-copy,
+	.disclosure-copy {
+		margin: 0;
+	}
+
+	.disclosure-copy a {
+		color: #8b949e;
+		text-decoration: underline;
+	}
+
+	.disclosure-copy a:hover {
+		color: #ffffff;
+	}
+</style>

@@ -1,0 +1,294 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import { SITE_TITLE } from '../../consts';
+
+export async function getStaticPaths() {
+	const allPosts = await getCollection('blog');
+
+	const authors = [
+		{
+			name: 'Julian Vance',
+			slug: 'julian-vance',
+			role: 'Senior Gaming Editor',
+			bio: 'Covers mobile action RPGs, gacha economies, and turn-based mechanics for PanBloom. Focuses on endgame meta breakdowns, build guides, and frame rate stability.',
+		},
+		{
+			name: 'Marcus Sterling',
+			slug: 'marcus-sterling',
+			role: 'Hardware & Emulation Specialist',
+			bio: 'Specializes in retro gaming emulators, Bluetooth controller mapping, and triple-A native mobile ports. Focuses on input latency, shader pipelines, and thermal performance.',
+		},
+		{
+			name: 'Elena Rostova',
+			slug: 'elena-rostova',
+			role: 'Mobile Games Columnist',
+			bio: 'Writes about mobile games, endless runners, and indie touchscreen titles. Her PanBloom coverage focuses on game design philosophy, touch physics, and free-to-play economy balance.',
+		},
+		{
+			name: 'Sophia Lin',
+			slug: 'sophia-lin',
+			role: 'Productivity & Privacy Lead',
+			bio: 'Covers mobile productivity tools, digital security, and OS privacy settings. Focuses on zero-trust mobile configurations, multi-calendar workflows, and data protection.',
+		},
+		{
+			name: 'Devon Brooks',
+			slug: 'devon-brooks',
+			role: 'Mobile Technology Analyst',
+			bio: 'Covers smartphone battery chemistry, AI mobile browsers, and mobile operating system telemetry. Focuses on empirical battery cycle testing and consumer usability.',
+		},
+		{
+			name: 'Claire Montgomery',
+			slug: 'claire-montgomery',
+			role: 'Creative Software Editor',
+			bio: 'Writes about professional creative apps, tablet video production, and stylus interfaces across iPadOS and Android. Focuses on multi-track NLEs, color grading LUTs, and SSD workflows.',
+		},
+		{
+			name: 'Sylvie Fox',
+			slug: 'sylvie-fox',
+			role: 'Mobile Features Writer',
+			bio: 'Covers mobile apps, Android, and iOS platform updates for PanBloom. Her articles focus on practical guides, hidden settings, and explaining new features in everyday use.',
+		},
+		{
+			name: 'Olivia Williams',
+			slug: 'olivia-williams',
+			role: 'Apps & Games Reporter',
+			bio: 'Writes about mobile applications and upcoming releases. Her coverage focuses on what users can realistically expect from an app and which launch features are worth testing.',
+		},
+		{
+			name: 'Daniel Clark',
+			slug: 'daniel-clark',
+			role: 'Consumer Tech Writer',
+			bio: 'Focuses on digital subscription services, consumer tech pricing, and head-to-head comparisons between competing mobile applications.',
+		},
+		{
+			name: 'Andrew Wright',
+			slug: 'andrew-wright',
+			role: 'Mobile Gaming Contributor',
+			bio: 'Covers mobile gaming releases, controller skins, and practical iPhone and Android setup walkthroughs designed to help readers make informed gaming choices.',
+		},
+		{
+			name: 'Michael Wilson',
+			slug: 'michael-wilson',
+			role: 'Staff Writer',
+			bio: 'Covers Android, iOS, and mobile game updates. Focuses on straightforward explanations, battery-saver settings, and practical guidance without technical jargon.',
+		},
+		{
+			name: 'PanBloom Editorial',
+			slug: 'panbloom-editorial',
+			role: 'Editorial Staff',
+			bio: 'The collective byline used for collaborative guides, platform updates, and benchmark analyses produced collectively by the PanBloom editorial team.',
+		},
+	];
+
+	return authors.map((author) => {
+		const filteredPosts = allPosts
+			.filter((post) => {
+				const authorName = ((post.data as any).author || '')
+					.toLowerCase()
+					.trim()
+					.replace(/[^a-z0-9]+/g, '-')
+					.replace(/(^-|-$)/g, '');
+				return authorName === author.slug;
+			})
+			.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+		return {
+			params: { author: author.slug },
+			props: { author, posts: filteredPosts },
+		};
+	});
+}
+
+const { author, posts } = Astro.props;
+
+const personSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'Person',
+	name: author.name,
+	jobTitle: author.role,
+	description: author.bio,
+	url: Astro.url.href,
+	worksFor: {
+		'@type': 'Organization',
+		name: 'PanBloom',
+		legalName: 'SATMAT DIGITAL LTD',
+		url: 'https://panbloom.com',
+	},
+};
+---
+
+<BaseLayout
+	title={`${author.name} - Author Profile | ${SITE_TITLE}`}
+	description={`${author.name} is a ${author.role} at PanBloom. Read their latest mobile game reviews, guides, and tech analyses.`}
+>
+	<script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
+	<div class="author-archive-page">
+		<div class="container">
+			<!-- Breadcrumb -->
+			<nav class="breadcrumb" aria-label="Breadcrumb">
+				<a href="/" class="crumb-link">Home</a>
+				<span class="crumb-sep">/</span>
+				<a href="/authors/" class="crumb-link">Authors</a>
+				<span class="crumb-sep">/</span>
+				<span class="crumb-current">{author.name}</span>
+			</nav>
+
+			<!-- Author Profile Header -->
+			<header class="profile-header">
+				<span class="profile-kicker">{author.role}</span>
+				<h1 class="profile-name">{author.name}</h1>
+				<p class="profile-bio">{author.bio}</p>
+			</header>
+
+			<!-- Author Articles Section -->
+			<section class="author-articles">
+				<div class="section-title-row">
+					<h2 class="section-heading">Articles by {author.name}</h2>
+					<span class="article-count">{posts.length} {posts.length === 1 ? 'Article' : 'Articles'}</span>
+				</div>
+
+				{
+					posts.length > 0 ? (
+						<div class="articles-grid">
+							{
+								posts.map((post) => (
+									<ArticleCard post={post} />
+								))
+							}
+						</div>
+					) : (
+						<div class="empty-state">
+							<p>No recent articles found under this byline. Check back soon for upcoming reviews!</p>
+							<a href="/authors/" class="back-link">&larr; Back to All Authors</a>
+						</div>
+					)
+				}
+			</section>
+		</div>
+	</div>
+</BaseLayout>
+
+<style>
+	.author-archive-page {
+		background-color: #ffffff;
+		padding-top: 2rem;
+		padding-bottom: 5rem;
+	}
+
+	.breadcrumb {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: 0.8125rem;
+		color: var(--color-text-muted);
+		margin-bottom: 1.75rem;
+	}
+
+	.crumb-link {
+		color: var(--color-blue-link);
+		text-decoration: none;
+	}
+
+	.crumb-link:hover {
+		text-decoration: underline;
+	}
+
+	.crumb-sep {
+		color: #cbd5e1;
+	}
+
+	.crumb-current {
+		color: var(--color-text-main);
+		font-weight: 600;
+	}
+
+	.profile-header {
+		margin-bottom: 3rem;
+		border-bottom: 1px solid #e5e7eb;
+		padding-bottom: 2rem;
+		max-width: 820px;
+	}
+
+	.profile-kicker {
+		font-size: 0.75rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: var(--color-badge-blue);
+		display: block;
+		margin-bottom: 0.5rem;
+	}
+
+	.profile-name {
+		font-size: 2.35rem;
+		font-weight: 800;
+		color: var(--color-text-main);
+		line-height: 1.2;
+		letter-spacing: -0.025em;
+		margin: 0 0 1rem 0;
+	}
+
+	.profile-bio {
+		font-size: 1.05rem;
+		line-height: 1.65;
+		color: var(--color-text-sub);
+		margin: 0;
+	}
+
+	.section-title-row {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		margin-bottom: 2rem;
+	}
+
+	.section-heading {
+		font-size: 1.35rem;
+		font-weight: 800;
+		color: var(--color-text-main);
+		margin: 0;
+	}
+
+	.article-count {
+		font-size: 0.875rem;
+		color: var(--color-text-muted);
+		font-weight: 500;
+	}
+
+	.articles-grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 2rem 1.75rem;
+	}
+
+	@media (min-width: 640px) {
+		.articles-grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	@media (min-width: 1024px) {
+		.articles-grid {
+			grid-template-columns: repeat(3, 1fr);
+			gap: 2.5rem 1.85rem;
+		}
+	}
+
+	.empty-state {
+		text-align: center;
+		padding: 3rem 1.5rem;
+		background: #f9fafb;
+		border-radius: 8px;
+		color: var(--color-text-muted);
+	}
+
+	.back-link {
+		color: var(--color-blue-link);
+		font-weight: 600;
+		text-decoration: underline;
+		margin-top: 1rem;
+		display: inline-block;
+	}
+</style>

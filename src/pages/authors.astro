@@ -1,0 +1,297 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE_TITLE } from '../consts';
+
+const authors = [
+	{
+		name: 'Julian Vance',
+		slug: 'julian-vance',
+		role: 'Senior Gaming Editor',
+		bio: 'Covers mobile action RPGs, gacha economies, and turn-based mechanics for PanBloom. Focuses on endgame meta breakdowns, build guides, and frame rate stability.',
+	},
+	{
+		name: 'Marcus Sterling',
+		slug: 'marcus-sterling',
+		role: 'Hardware & Emulation Specialist',
+		bio: 'Specializes in retro gaming emulators, Bluetooth controller mapping, and triple-A native mobile ports. Focuses on input latency, shader pipelines, and thermal performance.',
+	},
+	{
+		name: 'Elena Rostova',
+		slug: 'elena-rostova',
+		role: 'Mobile Games Columnist',
+		bio: 'Writes about mobile games, endless runners, and indie touchscreen titles. Her PanBloom coverage focuses on game design philosophy, touch physics, and free-to-play economy balance.',
+	},
+	{
+		name: 'Sophia Lin',
+		slug: 'sophia-lin',
+		role: 'Productivity & Privacy Lead',
+		bio: 'Covers mobile productivity tools, digital security, and OS privacy settings. Focuses on zero-trust mobile configurations, multi-calendar workflows, and data protection.',
+	},
+	{
+		name: 'Devon Brooks',
+		slug: 'devon-brooks',
+		role: 'Mobile Technology Analyst',
+		bio: 'Covers smartphone battery chemistry, AI mobile browsers, and mobile operating system telemetry. Focuses on empirical battery cycle testing and consumer usability.',
+	},
+	{
+		name: 'Claire Montgomery',
+		slug: 'claire-montgomery',
+		role: 'Creative Software Editor',
+		bio: 'Writes about professional creative apps, tablet video production, and stylus interfaces across iPadOS and Android. Focuses on multi-track NLEs, color grading LUTs, and SSD workflows.',
+	},
+	{
+		name: 'Sylvie Fox',
+		slug: 'sylvie-fox',
+		role: 'Mobile Features Writer',
+		bio: 'Covers mobile apps, Android, and iOS platform updates for PanBloom. Her articles focus on practical guides, hidden settings, and explaining new features in everyday use.',
+	},
+	{
+		name: 'Olivia Williams',
+		slug: 'olivia-williams',
+		role: 'Apps & Games Reporter',
+		bio: 'Writes about mobile applications and upcoming releases. Her coverage focuses on what users can realistically expect from an app and which launch features are worth testing.',
+	},
+	{
+		name: 'Daniel Clark',
+		slug: 'daniel-clark',
+		role: 'Consumer Tech Writer',
+		bio: 'Focuses on digital subscription services, consumer tech pricing, and head-to-head comparisons between competing mobile applications.',
+	},
+	{
+		name: 'Andrew Wright',
+		slug: 'andrew-wright',
+		role: 'Mobile Gaming Contributor',
+		bio: 'Covers mobile gaming releases, controller skins, and practical iPhone and Android setup walkthroughs designed to help readers make informed gaming choices.',
+	},
+	{
+		name: 'Michael Wilson',
+		slug: 'michael-wilson',
+		role: 'Staff Writer',
+		bio: 'Covers Android, iOS, and mobile game updates. Focuses on straightforward explanations, battery-saver settings, and practical guidance without technical jargon.',
+	},
+	{
+		name: 'PanBloom Editorial',
+		slug: 'panbloom-editorial',
+		role: 'Editorial Staff',
+		bio: 'The collective byline used for collaborative guides, platform updates, and benchmark analyses produced collectively by the PanBloom editorial team.',
+	},
+];
+---
+
+<BaseLayout
+	title={`Our Authors | ${SITE_TITLE}`}
+	description="Meet the PanBloom editorial team. Our expert writers, analysts, and gaming specialists provide independent mobile app and game reviews."
+>
+	<div class="authors-page">
+		<div class="container">
+			<!-- Breadcrumb Navigation -->
+			<nav class="breadcrumb" aria-label="Breadcrumb">
+				<a href="/" class="crumb-link">Home</a>
+				<span class="crumb-sep">/</span>
+				<span class="crumb-current">Authors</span>
+			</nav>
+
+			<!-- Header Section -->
+			<header class="authors-header">
+				<span class="kicker-tag">EDITORIAL TEAM</span>
+				<h1 class="page-title">Our Authors</h1>
+				<div class="intro-prose">
+					<p>
+						PanBloom has covered mobile apps and games since 2020. Our writers publish under consistent bylines, and each profile below outlines their core focus areas and testing expertise.
+					</p>
+					<p>
+						Our standards for reviews, device testing environments, corrections, and commercial independence are explained in detail in our <a href="/editorial-policy">Editorial Policy</a>.
+					</p>
+				</div>
+			</header>
+
+			<!-- 3-Column Responsive Authors Grid -->
+			<section class="authors-grid-section">
+				<div class="authors-grid">
+					{
+						authors.map((author) => (
+							<article class="author-card">
+								<span class="author-kicker">AUTHOR</span>
+								<h2 class="author-name">
+									<a href={`/author/${author.slug}/`}>{author.name}</a>
+								</h2>
+								<p class="author-bio">{author.bio}</p>
+								<div class="author-footer">
+									<a href={`/author/${author.slug}/`} class="view-articles-link">
+										View articles by {author.name}
+									</a>
+								</div>
+							</article>
+						))
+					}
+				</div>
+			</section>
+		</div>
+	</div>
+</BaseLayout>
+
+<style>
+	.authors-page {
+		background-color: #ffffff;
+		padding-top: 2rem;
+		padding-bottom: 5rem;
+	}
+
+	.breadcrumb {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: 0.8125rem;
+		color: var(--color-text-muted);
+		margin-bottom: 1.75rem;
+	}
+
+	.crumb-link {
+		color: var(--color-blue-link);
+		text-decoration: none;
+	}
+
+	.crumb-link:hover {
+		text-decoration: underline;
+	}
+
+	.crumb-sep {
+		color: #cbd5e1;
+	}
+
+	.crumb-current {
+		color: var(--color-text-main);
+		font-weight: 600;
+	}
+
+	.authors-header {
+		margin-bottom: 3.5rem;
+		border-bottom: 1px solid #e5e7eb;
+		padding-bottom: 2rem;
+	}
+
+	.kicker-tag {
+		font-size: 0.75rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: #4b5563;
+		display: block;
+		margin-bottom: 0.5rem;
+	}
+
+	.page-title {
+		font-size: 2.35rem;
+		font-weight: 800;
+		color: var(--color-text-main);
+		line-height: 1.2;
+		letter-spacing: -0.025em;
+		margin: 0 0 1.25rem 0;
+	}
+
+	@media (min-width: 768px) {
+		.page-title {
+			font-size: 2.5rem;
+		}
+	}
+
+	.intro-prose {
+		max-width: 720px;
+	}
+
+	.intro-prose p {
+		font-size: 1.05rem;
+		line-height: 1.65;
+		color: #374151;
+		margin: 0 0 0.85rem 0;
+	}
+
+	.intro-prose p:last-child {
+		margin-bottom: 0;
+	}
+
+	.intro-prose a {
+		color: var(--color-blue-link);
+		text-decoration: underline;
+	}
+
+	/* 3-Column Responsive Grid */
+	.authors-grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 2.5rem 2rem;
+	}
+
+	@media (min-width: 640px) {
+		.authors-grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	@media (min-width: 1024px) {
+		.authors-grid {
+			grid-template-columns: repeat(3, 1fr);
+			gap: 3rem 2rem;
+		}
+	}
+
+	/* Author Card (Text-driven editorial style) */
+	.author-card {
+		display: flex;
+		flex-direction: column;
+		background: transparent;
+	}
+
+	.author-kicker {
+		font-size: 0.72rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: #6b7280;
+		margin-bottom: 0.35rem;
+	}
+
+	.author-name {
+		font-size: 1.25rem;
+		font-weight: 700;
+		line-height: 1.3;
+		margin: 0 0 0.65rem 0;
+	}
+
+	.author-name a {
+		color: var(--color-text-main);
+		text-decoration: none;
+		transition: color 0.15s ease;
+	}
+
+	.author-name a:hover {
+		color: var(--color-blue-link);
+		text-decoration: underline;
+	}
+
+	.author-bio {
+		font-size: 0.9375rem;
+		line-height: 1.6;
+		color: #4b5563;
+		margin: 0 0 1rem 0;
+		flex-grow: 1;
+	}
+
+	.author-footer {
+		margin-top: auto;
+		padding-top: 0.25rem;
+	}
+
+	.view-articles-link {
+		color: var(--color-blue-link);
+		font-size: 0.875rem;
+		font-weight: 500;
+		text-decoration: none;
+		transition: color 0.15s ease;
+		display: inline-block;
+	}
+
+	.view-articles-link:hover {
+		text-decoration: underline;
+	}
+</style>

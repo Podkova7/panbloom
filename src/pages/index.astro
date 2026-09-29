@@ -1,0 +1,398 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+
+const posts = (await getCollection('blog')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+const websiteSchema = {
+	'@context': 'https://schema.org',
+	'@graph': [
+		{
+			'@type': 'Organization',
+			'@id': 'https://panbloom.com/#organization',
+			name: 'PanBloom',
+			legalName: 'SATMAT DIGITAL LTD',
+			url: 'https://panbloom.com',
+			logo: {
+				'@type': 'ImageObject',
+				url: 'https://panbloom.com/favicon.svg',
+			},
+			address: {
+				'@type': 'PostalAddress',
+				streetAddress: '308 St. Pauls Road',
+				addressLocality: 'London',
+				postalCode: 'N1 2LF',
+				addressCountry: 'GB',
+			},
+			contactPoint: {
+				'@type': 'ContactPoint',
+				email: 'editorial@panbloom.com',
+				contactType: 'Editorial & Customer Support',
+			},
+		},
+		{
+			'@type': 'WebSite',
+			'@id': 'https://panbloom.com/#website',
+			url: 'https://panbloom.com',
+			name: 'PanBloom',
+			description: SITE_DESCRIPTION,
+			publisher: {
+				'@id': 'https://panbloom.com/#organization',
+			},
+		},
+	],
+};
+---
+
+<BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
+	<script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
+	<div class="homepage">
+		<div class="container">
+			<!-- Hero Section -->
+			<section class="hero-section">
+				<h1 class="hero-title">Apps and mobile games, reviewed properly</h1>
+				<p class="hero-subheadline">
+					Hands-on reviews, guides and industry news for iOS and 
+					<span class="platform-pill">
+						<svg class="pill-icon" viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
+							<path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9996.4482.9996.9993.0001.5511-.4486.9997-.9996.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.4126 13.8533 8.0053 12 8.0053s-3.5902.4073-5.1368.9444L4.8409 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3432-4.1021-2.6889-7.5743-6.1185-9.4396"/>
+						</svg>
+						Android
+					</span>, published independently since 2020. 
+					<span class="platform-pill">
+						<svg class="pill-icon" viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
+							<path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.62-.75 1.04-1.8 0.92-2.85-.9.04-1.99.6-2.64 1.35-.58.67-.99 1.74-.85 2.78 1 .08 2-.54 2.57-1.28z"/>
+						</svg>
+						Apple iOS
+					</span>
+				</p>
+			</section>
+
+			<!-- 3-Column Responsive Article Grid -->
+			<section class="grid-section" id="grid-section">
+				<div class="article-grid" id="article-grid">
+					{
+						posts.map((post, index) => (
+							<div class:list={['article-item', { visible: index < 12 }]} data-index={index}>
+								<ArticleCard post={post} />
+							</div>
+						))
+					}
+				</div>
+
+				<!-- Dynamic Functional Pagination -->
+				<nav class="pagination" id="pagination-nav" aria-label="Page navigation">
+					<span class="page-item current">1</span>
+					<a href="/?page=2" class="page-item" data-page="2">2</a>
+					<span class="page-ellipsis">...</span>
+					<a href="/?page=8" class="page-item" data-page="8">8</a>
+					<a href="/?page=9" class="page-item" data-page="9">9</a>
+					<a href="/?page=2" class="page-item page-next" data-page="2">Next &rarr;</a>
+				</nav>
+			</section>
+		</div>
+	</div>
+</BaseLayout>
+
+<script is:inline>
+	(function() {
+		function initPagination() {
+			const PAGE_SIZE = 12;
+			const grid = document.getElementById('article-grid');
+			const paginationNav = document.getElementById('pagination-nav');
+			const gridSection = document.getElementById('grid-section');
+			if (!grid || !paginationNav) return;
+
+			const items = grid.querySelectorAll('.article-item');
+			const totalItems = items.length;
+			const totalPages = Math.ceil(totalItems / PAGE_SIZE);
+
+			function getPageFromUrl() {
+				const params = new URLSearchParams(window.location.search);
+				const p = parseInt(params.get('page'), 10);
+				return (!isNaN(p) && p >= 1 && p <= totalPages) ? p : 1;
+			}
+
+			function renderPage(page, updateHistory, shouldScroll) {
+				const startIndex = (page - 1) * PAGE_SIZE;
+				const endIndex = startIndex + PAGE_SIZE;
+
+				items.forEach((item, index) => {
+					if (index >= startIndex && index < endIndex) {
+						item.classList.add('visible');
+					} else {
+						item.classList.remove('visible');
+					}
+				});
+
+				renderPaginationControls(page);
+
+				if (updateHistory) {
+					const newUrl = page === 1 ? window.location.pathname : `${window.location.pathname}?page=${page}`;
+					if (window.location.search !== (page === 1 ? '' : `?page=${page}`)) {
+						window.history.pushState({ page: page }, '', newUrl);
+					}
+				}
+
+				if (shouldScroll && gridSection) {
+					const rect = gridSection.getBoundingClientRect();
+					const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+					const targetY = rect.top + scrollTop - 70;
+					window.scrollTo({ top: targetY, behavior: 'smooth' });
+				}
+			}
+
+			function renderPaginationControls(currentPage) {
+				if (totalPages <= 1) {
+					paginationNav.innerHTML = '';
+					return;
+				}
+
+				let html = '';
+
+				// Previous button
+				if (currentPage > 1) {
+					html += `<a href="${currentPage - 1 === 1 ? '/' : `/?page=${currentPage - 1}`}" class="page-item page-prev" data-page="${currentPage - 1}">&larr; Prev</a>`;
+				}
+
+				// Determine page numbers
+				const pages = [];
+				pages.push(1);
+
+				let start = Math.max(2, currentPage - 1);
+				let end = Math.min(totalPages - 1, currentPage + 1);
+
+				if (currentPage <= 3) {
+					end = Math.min(totalPages - 1, 4);
+				} else if (currentPage >= totalPages - 2) {
+					start = Math.max(2, totalPages - 3);
+				}
+
+				if (start > 2) {
+					pages.push('ellipsis');
+				}
+
+				for (let i = start; i <= end; i++) {
+					pages.push(i);
+				}
+
+				if (end < totalPages - 1) {
+					pages.push('ellipsis');
+				}
+
+				if (totalPages > 1) {
+					pages.push(totalPages);
+				}
+
+				// Generate items
+				pages.forEach((p) => {
+					if (p === 'ellipsis') {
+						html += `<span class="page-ellipsis">...</span>`;
+					} else if (p === currentPage) {
+						html += `<span class="page-item current">${p}</span>`;
+					} else {
+						html += `<a href="${p === 1 ? '/' : `/?page=${p}`}" class="page-item" data-page="${p}">${p}</a>`;
+					}
+				});
+
+				// Next button
+				if (currentPage < totalPages) {
+					html += `<a href="/?page=${currentPage + 1}" class="page-item page-next" data-page="${currentPage + 1}">Next &rarr;</a>`;
+				}
+
+				paginationNav.innerHTML = html;
+
+				// Bind click events
+				paginationNav.querySelectorAll('a[data-page]').forEach((link) => {
+					link.addEventListener('click', function(e) {
+						e.preventDefault();
+						const target = parseInt(this.getAttribute('data-page'), 10);
+						if (target && target !== currentPage) {
+							renderPage(target, true, true);
+						}
+					});
+				});
+			}
+
+			// Handle browser back and forward navigation
+			window.addEventListener('popstate', function() {
+				const p = getPageFromUrl();
+				renderPage(p, false, false);
+			});
+
+			// Initial page render based on URL
+			const initialPage = getPageFromUrl();
+			renderPage(initialPage, false, false);
+		}
+
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', initPagination);
+		} else {
+			initPagination();
+		}
+	})();
+</script>
+
+<style>
+	.homepage {
+		background-color: #ffffff;
+		padding-top: 2.25rem;
+		padding-bottom: 4rem;
+	}
+
+	/* Hero Section */
+	.hero-section {
+		margin-bottom: 2rem;
+	}
+
+	.hero-title {
+		font-size: 2.15rem;
+		font-weight: 800;
+		color: var(--color-text-main);
+		line-height: 1.2;
+		letter-spacing: -0.025em;
+		margin: 0 0 0.75rem 0;
+	}
+
+	@media (min-width: 768px) {
+		.hero-title {
+			font-size: 2.35rem;
+		}
+	}
+
+	.hero-subheadline {
+		font-size: 1rem;
+		line-height: 1.6;
+		color: var(--color-text-sub);
+		margin: 0;
+		max-width: 900px;
+	}
+
+	/* Blue pill-shaped badges */
+	.platform-pill {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.25rem;
+		background-color: var(--color-badge-blue);
+		color: #ffffff;
+		font-size: 0.75rem;
+		font-weight: 600;
+		padding: 0.15rem 0.55rem;
+		border-radius: 9999px;
+		vertical-align: middle;
+		line-height: 1.3;
+		margin: 0 0.15rem;
+	}
+
+	.pill-icon {
+		display: inline-block;
+		vertical-align: middle;
+	}
+
+	/* 3-Column Responsive Article Grid */
+	.grid-section {
+		margin-top: 1.5rem;
+	}
+
+	.article-grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 2rem 1.75rem;
+	}
+
+	.article-item {
+		display: none;
+		width: 100%;
+	}
+
+	.article-item.visible {
+		display: block;
+	}
+
+	@media (min-width: 640px) {
+		.article-grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	@media (min-width: 1024px) {
+		.article-grid {
+			grid-template-columns: repeat(3, 1fr);
+			gap: 2.5rem 1.85rem;
+		}
+	}
+
+	/* Pagination - Global selectors to style both SSR and client-rendered elements */
+	:global(.pagination) {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.85rem;
+		margin-top: 3.5rem;
+		margin-bottom: 2rem;
+		flex-wrap: wrap;
+	}
+
+	:global(.pagination .page-item) {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 48px;
+		height: 48px;
+		padding: 0 0.875rem;
+		border-radius: 12px;
+		background-color: #ffffff;
+		color: #1d3f9e;
+		font-size: 1rem;
+		font-weight: 500;
+		text-decoration: none;
+		border: 1px solid #e3e8ef;
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+		transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+	}
+
+	:global(.pagination .page-item:hover) {
+		background-color: #f8fafc;
+		border-color: #cbd5e1;
+		color: #1014a7;
+		text-decoration: none;
+	}
+
+	:global(.pagination .page-item.current) {
+		background-color: #10141c;
+		color: #ffffff;
+		border-color: #10141c;
+		font-weight: 500;
+		box-shadow: 0 2px 4px rgba(16, 20, 28, 0.12);
+		cursor: default;
+	}
+
+	:global(.pagination .page-item.current:hover) {
+		background-color: #10141c;
+		color: #ffffff;
+		border-color: #10141c;
+	}
+
+	:global(.pagination .page-ellipsis) {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		color: #111827;
+		font-size: 1rem;
+		font-weight: 500;
+		letter-spacing: 0.12em;
+		padding: 0 0.4rem;
+		user-select: none;
+	}
+
+	:global(.pagination .page-prev),
+	:global(.pagination .page-next) {
+		padding: 0 1.25rem;
+		gap: 0.4rem;
+		font-weight: 500;
+	}
+</style>

@@ -1,0 +1,83 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+
+const posts = (await getCollection('blog')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+---
+
+<BaseLayout title={`All Articles | ${SITE_TITLE}`} description={SITE_DESCRIPTION}>
+	<div class="archive-page">
+		<div class="container">
+			<header class="archive-header">
+				<h1 class="archive-title">All Articles &amp; Reviews</h1>
+				<p class="archive-desc">
+					Browse our full index of mobile game reviews, iOS and Android application teardowns, comparisons, and power-user tips.
+				</p>
+			</header>
+
+			<div class="articles-grid">
+				{
+					posts.map((post) => (
+						<div class="grid-item">
+							<ArticleCard post={post} />
+						</div>
+					))
+				}
+			</div>
+		</div>
+	</div>
+</BaseLayout>
+
+<style>
+	.archive-page {
+		padding: 3rem 0 5rem;
+	}
+
+	.archive-header {
+		margin-bottom: 2.5rem;
+		border-bottom: 2px solid var(--color-border);
+		padding-bottom: 1.25rem;
+	}
+
+	.archive-title {
+		font-size: 2.25rem;
+		font-weight: 800;
+		color: var(--color-text-dark);
+		letter-spacing: -0.025em;
+		margin: 0 0 0.5rem 0;
+	}
+
+	.archive-desc {
+		font-size: 1rem;
+		color: var(--color-text-muted);
+		margin: 0;
+		max-width: 680px;
+	}
+
+	.articles-grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 2rem 1.5rem;
+	}
+
+	@media (min-width: 640px) {
+		.articles-grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	@media (min-width: 1024px) {
+		.articles-grid {
+			grid-template-columns: repeat(3, 1fr);
+			gap: 2.5rem 2rem;
+		}
+	}
+
+	.grid-item {
+		height: 100%;
+	}
+</style>

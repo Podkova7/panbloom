@@ -1,0 +1,193 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import FormattedDate from './FormattedDate.astro';
+import FallbackImage from '../assets/blog-placeholder-1.jpg';
+
+interface Props {
+	post?: CollectionEntry<'blog'>;
+	id?: string;
+	title?: string;
+	description?: string;
+	pubDate?: Date;
+	heroImage?: any;
+	category?: string;
+	author?: string;
+}
+
+const { post } = Astro.props;
+
+const id = post ? post.id : Astro.props.id || '';
+const title = post ? post.data.title : Astro.props.title || 'Untitled Post';
+const description = post ? post.data.description : Astro.props.description || '';
+const pubDate = post ? post.data.pubDate : Astro.props.pubDate || new Date();
+const heroImage = (post ? post.data.heroImage : Astro.props.heroImage) || FallbackImage;
+const category = (post ? (post.data as any).category : Astro.props.category) || 'App Reviews';
+const categorySlug = category.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+const author = (post ? (post.data as any).author : Astro.props.author) || 'PanBloom Editorial';
+const authorSlug = author.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+---
+
+<article class="article-card">
+	<!-- Rounded full-width thumbnail at the top -->
+	<a href={`/blog/${id}/`} class="thumbnail-link" aria-label={`Read article: ${title}`}>
+		<div class="thumbnail-wrapper">
+			{typeof heroImage === 'string' ? (
+				<img
+					src={heroImage}
+					alt={title}
+					width="640"
+					height="360"
+					class="card-image"
+					loading="lazy"
+				/>
+			) : (
+				<Image
+					src={heroImage}
+					alt={title}
+					width={640}
+					height={360}
+					class="card-image"
+					loading="lazy"
+				/>
+			)}
+		</div>
+	</a>
+
+	<!-- Card Content: Category label, bold title, gray excerpt, author/date -->
+	<div class="card-content">
+		<a href={`/category/${categorySlug}/`} class="category-label">{category}</a>
+
+		<h3 class="card-title">
+			<a href={`/blog/${id}/`}>{title}</a>
+		</h3>
+
+		<p class="card-excerpt">{description}</p>
+
+		<div class="card-meta">
+			<a href={`/author/${authorSlug}/`} class="author-link">{author}</a>
+			<span class="meta-sep">-</span>
+			<span class="meta-date">
+				<FormattedDate date={pubDate} />
+			</span>
+		</div>
+	</div>
+</article>
+
+<style>
+	/* Clean, borderless card */
+	.article-card {
+		background: transparent;
+		border: none;
+		box-shadow: none;
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+	}
+
+	.thumbnail-link {
+		display: block;
+		text-decoration: none;
+		border-radius: 8px;
+		overflow: hidden;
+	}
+
+	.thumbnail-wrapper {
+		width: 100%;
+		aspect-ratio: 16 / 9;
+		overflow: hidden;
+		background-color: #111827;
+		border-radius: 8px;
+	}
+
+	.card-image {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+		transition: transform 0.25s ease;
+	}
+
+	.thumbnail-link:hover .card-image {
+		transform: scale(1.03);
+	}
+
+	.card-content {
+		display: flex;
+		flex-direction: column;
+		padding-top: 0.65rem;
+	}
+
+	/* Small uppercase category label */
+	.category-label {
+		font-size: 0.72rem;
+		font-weight: 800;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: var(--color-blue-link);
+		margin-bottom: 0.35rem;
+		display: block;
+	}
+
+	/* Bold high-contrast title */
+	.card-title {
+		font-size: 1.05rem;
+		font-weight: 700;
+		line-height: 1.3;
+		margin: 0 0 0.4rem 0;
+	}
+
+	.card-title a {
+		color: var(--color-text-main);
+		text-decoration: none;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		transition: color 0.15s ease;
+	}
+
+	.card-title a:hover {
+		color: var(--color-blue-link);
+		text-decoration: underline;
+	}
+
+	/* Short gray excerpt */
+	.card-excerpt {
+		font-size: 0.84rem;
+		line-height: 1.45;
+		color: var(--color-text-sub);
+		margin: 0 0 0.55rem 0;
+		display: -webkit-box;
+		-webkit-line-clamp: 3;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+
+	/* Author and date line */
+	.card-meta {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 0.35rem;
+		font-size: 0.8125rem;
+	}
+
+	.author-link {
+		color: var(--color-blue-link);
+		font-weight: 500;
+		text-decoration: none;
+	}
+
+	.author-link:hover {
+		text-decoration: underline;
+	}
+
+	.meta-sep {
+		color: var(--color-text-muted);
+	}
+
+	.meta-date {
+		color: var(--color-text-muted);
+	}
+</style>

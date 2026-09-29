@@ -1,0 +1,88 @@
+/* Clean sans-serif typography stack with pure white content background */
+
+:root {
+	--color-header-bg: #0c121e;
+	--color-header-border: #1e2638;
+	--color-footer-bg: #0c121e;
+	--color-body-bg: #ffffff;
+	--color-text-main: #111827;
+	--color-text-sub: #4b5563;
+	--color-text-muted: #6b7280;
+	--color-blue-link: #1d4ed8;
+	--color-blue-hover: #1e40af;
+	--color-badge-blue: #1d4ed8;
+	--font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+}
+
+*, *::before, *::after {
+	box-sizing: border-box;
+}
+
+html, body {
+	margin: 0;
+	padding: 0;
+	background-color: var(--color-body-bg);
+	color: var(--color-text-main);
+	font-family: var(--font-stack);
+	font-size: 16px;
+	line-height: 1.5;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+body {
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+}
+
+.main-content {
+	flex: 1 0 auto;
+	width: 100%;
+	background-color: #ffffff;
+}
+
+.container {
+	width: 100%;
+	max-width: 1200px;
+	margin-left: auto;
+	margin-right: auto;
+	padding-left: 1.25rem;
+	padding-right: 1.25rem;
+}
+
+@media (min-width: 768px) {
+	.container {
+		padding-left: 2rem;
+		padding-right: 2rem;
+	}
+}
+
+a {
+	color: var(--color-blue-link);
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+img {
+	max-width: 100%;
+	height: auto;
+	display: block;
+}
+
+/* Screen reader utility */
+.sr-only {
+	border: 0;
+	padding: 0;
+	margin: 0;
+	position: absolute !important;
+	height: 1px;
+	width: 1px;
+	overflow: hidden;
+	clip: rect(1px, 1px, 1px, 1px);
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
