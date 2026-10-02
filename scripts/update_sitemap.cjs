@@ -24,7 +24,8 @@ const categories = [
   'app-tips',
   'comparisons',
   'news',
-  'best-picks'
+  'best-picks',
+  'guides'
 ];
 
 const categoryPages = categories.map((slug) => ({
